@@ -31,6 +31,8 @@ public class Task {
     this.pi = pi;
 
     this.isBlocked = false;
+    this.isReady = true;
+    this.isRunning = false;
     this.blockTime = 0;
   }
 
