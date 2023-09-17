@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,12 +16,50 @@ public class App {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Digite o nome do arquivo a ser lido: ");
-        String file = scanner.nextLine();
-        file = "programas_teste/" + file;
+        ArrayList<Task> tasks = new ArrayList<Task>();
 
-        // Guarda as variáveis da área de dados
-        // Verifica tamanho do programa e organiza codigo para facilitar a busca do PC
+        System.out.println("Informe as tarefas que serão executadas.");
+
+        boolean reading = true;
+
+        while (reading) {
+            System.out.print("Digite o nome da tarefa: ");
+            String file = scanner.nextLine();
+            file = "programas_teste/" + file;
+
+            System.out.print("Informe o instante de carga da tarefa: ");
+            int arrivalTime = scanner.nextInt();
+
+            System.out.print("Informe o tempo de execução da tarefa: ");
+            int ci = scanner.nextInt();
+
+            System.out.print("Informe o período da tarefa: ");
+            int pi = scanner.nextInt();
+
+            Task task = new Task(file, arrivalTime, ci, pi);
+            tasks.add(task);
+            
+            System.out.print("Digite 0 se você terminou de inserir tarefas, ou qualquer tecla para adicionar mais tarefas: ");
+            scanner.nextLine();
+            String moreTask = scanner.nextLine();
+
+            if(moreTask.equals("0")) {
+                reading = false;
+            }
+            
+        }
+        
+        for (Task task : tasks) {
+            System.out.println(task.toString());
+        }
+        
+
+        // Executa o programa
+        // execute(scanner);
+        scanner.close();
+    }
+
+    private static void readFile(String file) {
         try {
             FileReader flieReader = new FileReader(file);
             BufferedReader reader = new BufferedReader(flieReader);
@@ -65,22 +104,6 @@ public class App {
             System.err.println("Ocorreu um erro ao ler o arquivo: " + e.getMessage());
         }
 
-        // // Imprime a área de dados do programa
-        // System.out.println(dataDict.toString() + "\n");
-
-        // // Imprime a área de código do programa
-        // System.out.println(codeDict.toString() + "\n");
-        // for (int i = 0; i < codeDict.size(); i++) {
-        //     System.out.println(codeDict.get(i)[0] + " " + codeDict.get(i)[1]);
-        // }
-
-        // // Imprime a área de jumps do programa
-        // System.out.println(jumpDict.toString() + "\n");
-
-
-        // Executa o programa
-        execute(scanner);
-        scanner.close();
     }
 
     private static void execute(Scanner scanner) {
@@ -90,9 +113,6 @@ public class App {
             String[] codeLine = codeDict.get(pc);
             String instruction = codeLine[0];
             String op = codeLine[1].toLowerCase();
-
-            // Descomentar para imprimir qual instruçao esta executando
-            // System.out.println(instruction + " " + op);
 
             switch (instruction.toLowerCase()) {
                 case "add":
