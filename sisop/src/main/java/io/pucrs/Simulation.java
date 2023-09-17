@@ -45,17 +45,39 @@ public class Simulation {
     // Simulation loop
     this.currentTime = 0;
     while (this.currentTime <= this.config.getTotalTime()) {
-      // TODO Compute program information
-      // TODO Update states
-      // TODO Display current time information
+      /*
+       * 1) analisa o menor deadline
+       * 2) executa a tarefa com menor deadline
+       * 3) retorna para lista de prontos
+       * 4) atualiza os estados
+       * 5) analisa novamente o menor deadline
+       */
 
-      break;
+      DisplaySimulation();
     }
 
     // TODO End simulation
   }
 
-  public ConfigParser ReadConfigFile() {
+  private void DisplaySimulation() {
+    String displayTasks = "";
+    for (int i = 0; i < tasks.size(); i++) {
+      displayTasks += "\tT" + i;
+    }
+    System.out.println("");
+  }
+
+  private Task GetSmallestDeadlineTask() {
+    int smallestDealine = Integer.MAX_VALUE;
+    int taskIndex = 0;
+    for (Task task : tasks) {
+      if (task.getPi() < smallestDealine) {
+        smallestDealine = task.getPi();
+      }
+    }
+  }
+
+  private ConfigParser ReadConfigFile() {
     try {
       ObjectMapper objectMapper = new ObjectMapper();
       File configFile = new File(this.path);
