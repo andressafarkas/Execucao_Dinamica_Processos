@@ -22,8 +22,16 @@ public class Simulation {
   private List<Task> tasks;
   private ConfigParser config;
 
+  private List<Task> blocked;
+  private List<Task> ready;
+  private List<Task> running;
+
   public Simulation(String path) {
     this.path = path;
+
+    this.blocked = new ArrayList<>();
+    this.ready = new ArrayList<>();
+    this.running = new ArrayList<>();
   }
 
   public void Run() {
@@ -34,7 +42,7 @@ public class Simulation {
     this.tasks = new ArrayList<>();
 
     for (int i = 0; i < config.getFiles().size(); i++) {
-      tasks.add(
+      this.tasks.add(
           new Task(
               config.getFiles().get(i),
               config.getArrivalTimes().get(i),
@@ -43,6 +51,7 @@ public class Simulation {
     }
 
     // Simulation loop
+    DisplayHeader();
     this.currentTime = 0;
     while (this.currentTime <= this.config.getTotalTime()) {
       /*
@@ -53,18 +62,31 @@ public class Simulation {
        * 5) analisa novamente o menor deadline
        */
 
-      DisplaySimulation();
+      currentTime++;
+
+      DisplaySimulation(currentTime);
     }
 
     // TODO End simulation
   }
 
-  private void DisplaySimulation() {
+  private void DisplayHeader() {
     String displayTasks = "";
-    for (int i = 0; i < tasks.size(); i++) {
+    for (int i = 0; i < this.tasks.size(); i++) {
       displayTasks += "\tT" + i;
     }
-    System.out.println("");
+    System.out.println(displayTasks);
+  }
+
+  private void DisplaySimulation(int currentTime) {
+    String displayTasks = Integer.toString(currentTime);
+    for (int i = 0; i < this.tasks.size(); i++) {
+      if (this.tasks.get(i).isRunning())
+        displayTasks += "\tX";
+      else
+        displayTasks += "\t-";
+    }
+    System.out.println(displayTasks);
   }
 
   private Task GetSmallestDeadlineTask() {
@@ -75,6 +97,7 @@ public class Simulation {
         smallestDealine = task.getPi();
       }
     }
+    return null;
   }
 
   private ConfigParser ReadConfigFile() {

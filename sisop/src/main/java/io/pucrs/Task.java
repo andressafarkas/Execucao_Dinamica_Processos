@@ -19,6 +19,7 @@ public class Task {
   private Map<String, Integer> jumpDict = new HashMap<>();
   private int pc;
   private double acc;
+  @Getter
   private boolean isBlocked;
   private boolean isReady;
   private boolean isRunning;
