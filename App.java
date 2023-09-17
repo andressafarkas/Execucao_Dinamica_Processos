@@ -8,12 +8,6 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class App {
-    private static double acc = 0;
-    private static int pc = 0;
-    private static Map<String, Double> dataDict = new HashMap<>();
-    private static Map<Integer, String[]> codeDict = new HashMap<>();
-    private static Map<String, Integer> jumpDict = new HashMap<>();
-
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         ArrayList<Task> tasks = new ArrayList<Task>();
@@ -59,9 +53,9 @@ public class App {
         scanner.close();
     }
 
-    private static void readFile(String file) {
+    private static void readFile(Task task) {
         try {
-            FileReader flieReader = new FileReader(file);
+            FileReader flieReader = new FileReader(task.file);
             BufferedReader reader = new BufferedReader(flieReader);
             String line;
             boolean dataArea = false;
@@ -85,16 +79,16 @@ public class App {
                 } else if (instruction.toLowerCase().equals(".enddata")) {
                     dataArea = false;
                 } else if (dataArea) {
-                    dataDict.put(instruction, Double.parseDouble(words[1]));
+                    task.dataDict.put(instruction, Double.parseDouble(words[1]));
                 } else if (instruction.toLowerCase().equals(".code")) {
                     codeArea = true;
                 } else if (instruction.toLowerCase().equals(".endcode")) {
                     codeArea = false;
                 } else if (codeArea) {
                     if (words.length == 1) {
-                        jumpDict.put(words[0].toLowerCase().replace(":", ""), cont);
+                        task.jumpDict.put(words[0].toLowerCase().replace(":", ""), cont);
                     } else {
-                        codeDict.put(cont, words);
+                        task.codeDict.put(cont, words);
                         cont+=1;
                     }
                 }
@@ -106,11 +100,11 @@ public class App {
 
     }
 
-    private static void execute(Scanner scanner) {
+    private static void execute(Scanner scanner, Task task) {
         boolean endcode = false;
 
         while(!endcode) {
-            String[] codeLine = codeDict.get(pc);
+            String[] codeLine = task.codeDict.get(task.pc);
             String instruction = codeLine[0];
             String op = codeLine[1].toLowerCase();
 
@@ -118,84 +112,84 @@ public class App {
                 case "add":
                     if (op.startsWith("#")) {
                         double inc = Double.parseDouble(op.replace("#", ""));
-                        updateAcc(acc+inc);
+                        task.updateAcc(task.acc+inc);
                     } else { 
-                        double inc = dataDict.get(op);
-                        updateAcc(acc+inc);
+                        double inc = task.dataDict.get(op);
+                        task.updateAcc(task.acc+inc);
                     }
-                    updatePc(pc+1);
+                    task.updatePc(task.pc+1);
                     break;
 
                 case "sub":
                     if (op.startsWith("#")) {
                         double inc = Double.parseDouble(op.replace("#", ""));
-                        updateAcc(acc-inc);
+                        task.updateAcc(task.acc-inc);
                     } else { 
-                        double inc = dataDict.get(op);
-                        updateAcc(acc-inc);
+                        double inc = task.dataDict.get(op);
+                        task.updateAcc(task.acc-inc);
                     }
-                    updatePc(pc+1);
+                    task.updatePc(task.pc+1);
                     break;
 
                 case "mult":
                     if (op.startsWith("#")) {
                         double inc = Double.parseDouble(op.replace("#", ""));
-                        updateAcc(acc*inc);
+                        task.updateAcc(task.acc*inc);
                     } else { 
-                        double inc = dataDict.get(op);
-                        updateAcc(acc*inc);
+                        double inc = task.dataDict.get(op);
+                        task.updateAcc(task.acc*inc);
                     }
-                    updatePc(pc+1);
+                    task.updatePc(task.pc+1);
                     break;
 
                 case "div":
                     if (op.startsWith("#")) {
                         double inc = Double.parseDouble(op.replace("#", ""));
-                        updateAcc(acc/inc);
+                        task.updateAcc(task.acc/inc);
                     } else { 
-                        double inc = dataDict.get(op);
-                        updateAcc(acc/inc);
+                        double inc = task.dataDict.get(op);
+                        task.updateAcc(task.acc/inc);
                     }
-                    updatePc(pc+1);
+                    task.updatePc(task.pc+1);
                     break;
 
                 case "load":
-                    double data = dataDict.get(op);
-                    updateAcc(data);
-                    updatePc(pc+1);
+                    double data = task.dataDict.get(op);
+                    task.updateAcc(data);
+                    task.updatePc(task.pc+1);
                     break;
 
                 case "store":
-                    dataDict.remove(op);
-                    dataDict.put(op, acc);
-                    updatePc(pc+1);
+                    task.dataDict.remove(op);
+                    task.dataDict.put(op, task.acc);
+                    task.updatePc(task.pc+1);
                     break;
 
                 case "brany":
-                    updatePc(jumpDict.get(op));
+                    task.updatePc(task.jumpDict.get(op));
                     break;
 
                 case "brpos":
-                    if (acc > 0) {
-                        updatePc(jumpDict.get(op));
+                    if (task.acc > 0) {
+                        task.updatePc(task.jumpDict.get(op));
                     } else {
-                        updatePc(pc+1);
+                        task.updatePc(task.pc+1);
                     }
                     break;
 
                 case "brzero":
-                    if (acc == 0) {
-                        updatePc(jumpDict.get(op));
+                    if (task.acc == 0) {
+                        task.updatePc(task.jumpDict.get(op));
                     } else {
-                        updatePc(pc+1);
+                        task.updatePc(task.pc+1);
                     }
                     break;
 
                 case "brneg":
-                    if (acc < 0) {
-                        updatePc(jumpDict.get(op));
+                    if (task.acc < 0) {
+                        task.updatePc(task.jumpDict.get(op));
                     } else {
-                        updatePc(pc+1);
+                        task.updatePc(task.pc+1);
                     }
                     break;
 
@@ -204,23 +198,15 @@ public class App {
                         System.out.println("Finalizou");
                         endcode = true;
                     } else if (op.equals("1")) {
-                        System.out.println(acc);
+                        System.out.println(task.acc);
                     } else if (op.equals("2")) {
-                        acc = scanner.nextDouble();
+                        task.acc = scanner.nextDouble();
                     }
-                    updatePc(pc+1);
+                    task.updatePc(task.pc+1);
                     break;
                 default: 
                     break;
             }
         }
-    }
-
-    private static void updateAcc(double newAcc) {
-        acc = newAcc;
-    }
-    
-    private static void updatePc(int newPc) {
-        pc = newPc;
     }
 }
