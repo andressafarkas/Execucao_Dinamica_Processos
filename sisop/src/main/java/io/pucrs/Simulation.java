@@ -11,20 +11,27 @@ import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
-@AllArgsConstructor
+@Getter
+@Setter
 public class Simulation {
-  @Getter
   private String path;
+  private int currentTime;
+  private List<Task> tasks;
+  private ConfigParser config;
+
+  public Simulation(String path) {
+    this.path = path;
+  }
 
   public void Run() {
     // Get config information
-    ConfigParser config = ReadConfigFile();
+    this.config = ReadConfigFile();
 
     // Set initial states
-    List<Task> tasks = new ArrayList<>();
+    this.tasks = new ArrayList<>();
 
     for (int i = 0; i < config.getFiles().size(); i++) {
       tasks.add(
@@ -36,10 +43,9 @@ public class Simulation {
     }
 
     // Simulation loop
-    int currentTime = 0;
-    while (currentTime <= config.getTotalTime()) {
+    this.currentTime = 0;
+    while (this.currentTime <= this.config.getTotalTime()) {
       // TODO Compute program information
-      currentTime += ComputeSmallestDeadlineProgram(tasks);
       // TODO Update states
       // TODO Display current time information
 
@@ -47,21 +53,6 @@ public class Simulation {
     }
 
     // TODO End simulation
-  }
-
-  public int ComputeSmallestDeadlineProgram(List<Task> tasks) {
-    int smallestDeadline = Integer.MAX_VALUE;
-    int taskIndex = 0;
-    for (int i = 0; i < tasks.size(); i++) {
-      if (tasks.get(i).getPi() < smallestDeadline) {
-        smallestDeadline = tasks.get(i).getPi();
-        taskIndex = i;
-      }
-    }
-
-    // update task deadline
-
-    return tasks.get(taskIndex).getCi();
   }
 
   public ConfigParser ReadConfigFile() {
