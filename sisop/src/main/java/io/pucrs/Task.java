@@ -12,6 +12,8 @@ import lombok.Setter;
 public class Task {
   private String file;
   private int arrivalTime;
+  private boolean isFinished;
+  private int executedCi;
   private int ci;
   private int pi;
   private Map<String, Double> dataDict = new HashMap<>();
@@ -19,7 +21,6 @@ public class Task {
   private Map<String, Integer> jumpDict = new HashMap<>();
   private int pc;
   private double acc;
-  @Getter
   private boolean isBlocked;
   private boolean isReady;
   private boolean isRunning;
@@ -31,10 +32,22 @@ public class Task {
     this.ci = ci;
     this.pi = pi;
 
+    this.isFinished = false;
+    this.executedCi = 0;
     this.isBlocked = false;
     this.isReady = true;
     this.isRunning = false;
     this.blockTime = 0;
+  }
+
+  public void updateCi() {
+    this.executedCi++;
+    if (this.executedCi == this.ci) {
+      this.isRunning = false;
+      this.isReady = true;
+      this.executedCi = 0;
+      this.isFinished = true;
+    }
   }
 
   public void updateAcc(double newAcc) {

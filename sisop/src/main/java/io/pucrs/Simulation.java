@@ -19,7 +19,7 @@ import lombok.Setter;
 public class Simulation {
   private String path;
   private int currentTime;
-  private List<Task> tasks;
+  private Task currentTask;
   private ConfigParser config;
 
   private List<Task> blocked;
@@ -39,10 +39,12 @@ public class Simulation {
     this.config = ReadConfigFile();
 
     // Set initial states
-    this.tasks = new ArrayList<>();
+    this.ready = new ArrayList<>();
+    this.blocked = new ArrayList<>();
+    this.running = new ArrayList<>();
 
     for (int i = 0; i < config.getFiles().size(); i++) {
-      this.tasks.add(
+      this.ready.add(
           new Task(
               config.getFiles().get(i),
               config.getArrivalTimes().get(i),
@@ -54,50 +56,73 @@ public class Simulation {
     DisplayHeader();
     this.currentTime = 0;
     while (this.currentTime <= this.config.getTotalTime()) {
-      /*
-       * 1) analisa o menor deadline
-       * 2) executa a tarefa com menor deadline
-       * 3) retorna para lista de prontos
-       * 4) atualiza os estados
-       * 5) analisa novamente o menor deadline
-       */
+      // analisa menor deadline
 
-      currentTime++;
+      Task task = GetSmallestDeadlineTask();
 
-      DisplaySimulation(currentTime);
+      // executar linha código dela
+      // atualiza acc e pc
+
+      this.currentTime++;
+
+      DisplaySimulation(currentTime, task);
+
+      UpdateDeadlines();
     }
 
     // TODO End simulation
   }
 
+  private void UpdateDeadlines() {
+    for (int i = 0; i < this.ready.size(); i++) {
+      if (this.ready.get(i).getPi() == this.currentTime) {
+        this.ready.get(i).setFinished(false);
+        int newCi = this.ready.get(i).getCi() + this.ready.get(i).getCi();
+        this.ready.get(i).setPi(newCi);
+      }
+    }
+  }
+
+  private Task GetSmallestDeadlineTask() {
+    int smallestDealine = this.running.size() > 0 ? this.running.get(0).getPi() : Integer.MAX_VALUE;
+    int taskIndex = 0;
+    int priority = 0; // 0 - running; 1 - ready; 2 - blocked
+    for (int i = 0; i < this.ready.size(); i++) {
+      if (this.ready.get(i).isFinished() == false && this.ready.get(i).getPi() < smallestDealine) {
+        smallestDealine = this.ready.get(i).getPi();
+        taskIndex = i;
+      }
+    }
+
+    if (this.running.size() > 0 && this.running.get(0).getPi() > smallestDealine) {
+      this.ready.add(this.running.remove(0));
+      this.running.add(this.ready.get(taskIndex));
+    } else if (this.running.isEmpty()) {
+      this.running.add(this.ready.get(taskIndex));
+    }
+
+    if (taskIndex < 0)
+      return this.running.get(0);
+    return this.ready.get(taskIndex);
+  }
+
   private void DisplayHeader() {
     String displayTasks = "";
-    for (int i = 0; i < this.tasks.size(); i++) {
+    for (int i = 0; i < this.config.getFiles().size(); i++) {
       displayTasks += "\tT" + i;
     }
     System.out.println(displayTasks);
   }
 
-  private void DisplaySimulation(int currentTime) {
+  private void DisplaySimulation(int currentTime, Task task) {
     String displayTasks = Integer.toString(currentTime);
-    for (int i = 0; i < this.tasks.size(); i++) {
-      if (this.tasks.get(i).isRunning())
-        displayTasks += "\tX";
-      else
-        displayTasks += "\t-";
+
+    if (this.running.size() == 0) {
+      displayTasks += "\t-";
+    } else {
+      displayTasks += "\t" + this.currentTask.getFile();
     }
     System.out.println(displayTasks);
-  }
-
-  private Task GetSmallestDeadlineTask() {
-    int smallestDealine = Integer.MAX_VALUE;
-    int taskIndex = 0;
-    for (Task task : tasks) {
-      if (task.getPi() < smallestDealine) {
-        smallestDealine = task.getPi();
-      }
-    }
-    return null;
   }
 
   private ConfigParser ReadConfigFile() {
