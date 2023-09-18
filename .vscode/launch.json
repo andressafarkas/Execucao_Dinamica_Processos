@@ -17,7 +17,7 @@
       "mainClass": "io.pucrs.App",
       "args": [
         "-G",
-        "C:\\Users\\frtas\\source\\repos\\Execucao_Dinamica_Processos\\config.json"
+        "C:\\Users\\frtas\\source\\repos\\Execucao_Dinamica_Processos\\sisop\\config.json"
       ],
       "projectName": "sisop"
     }

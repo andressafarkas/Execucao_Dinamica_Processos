@@ -53,19 +53,21 @@ public class Simulation {
     }
 
     // Simulation loop
-    DisplayHeader();
+    // DisplayHeader();
     this.currentTime = 0;
     while (this.currentTime <= this.config.getTotalTime()) {
       // analisa menor deadline
 
-      Task task = GetSmallestDeadlineTask();
-
+      GetSmallestDeadlineTask();
       // executar linha código dela
       // atualiza acc e pc
 
       this.currentTime++;
 
-      DisplaySimulation(currentTime, task);
+      if (!this.running.isEmpty())
+        this.running.get(0).updateCi();
+
+      DisplaySimulation(currentTime);
 
       UpdateDeadlines();
     }
@@ -81,12 +83,15 @@ public class Simulation {
         this.ready.get(i).setPi(newCi);
       }
     }
+
+    if (this.running.get(0).isFinished()) {
+      this.ready.add(this.running.remove(0));
+    }
   }
 
-  private Task GetSmallestDeadlineTask() {
+  private void GetSmallestDeadlineTask() {
     int smallestDealine = this.running.size() > 0 ? this.running.get(0).getPi() : Integer.MAX_VALUE;
     int taskIndex = 0;
-    int priority = 0; // 0 - running; 1 - ready; 2 - blocked
     for (int i = 0; i < this.ready.size(); i++) {
       if (this.ready.get(i).isFinished() == false && this.ready.get(i).getPi() < smallestDealine) {
         smallestDealine = this.ready.get(i).getPi();
@@ -100,27 +105,15 @@ public class Simulation {
     } else if (this.running.isEmpty()) {
       this.running.add(this.ready.get(taskIndex));
     }
-
-    if (taskIndex < 0)
-      return this.running.get(0);
-    return this.ready.get(taskIndex);
   }
 
-  private void DisplayHeader() {
-    String displayTasks = "";
-    for (int i = 0; i < this.config.getFiles().size(); i++) {
-      displayTasks += "\tT" + i;
-    }
-    System.out.println(displayTasks);
-  }
-
-  private void DisplaySimulation(int currentTime, Task task) {
+  private void DisplaySimulation(int currentTime) {
     String displayTasks = Integer.toString(currentTime);
 
-    if (this.running.size() == 0) {
+    if (this.running.isEmpty()) {
       displayTasks += "\t-";
     } else {
-      displayTasks += "\t" + this.currentTask.getFile();
+      displayTasks += "\t" + this.running.get(0).getFile();
     }
     System.out.println(displayTasks);
   }

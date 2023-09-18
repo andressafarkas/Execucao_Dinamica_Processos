@@ -43,8 +43,6 @@ public class Task {
   public void updateCi() {
     this.executedCi++;
     if (this.executedCi == this.ci) {
-      this.isRunning = false;
-      this.isReady = true;
       this.executedCi = 0;
       this.isFinished = true;
     }
