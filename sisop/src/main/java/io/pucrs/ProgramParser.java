@@ -1,9 +1,5 @@
 package io.pucrs;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -14,76 +10,6 @@ public class ProgramParser {
   private Map<String, Double> dataDict = new HashMap<>();
   private Map<Integer, String[]> codeDict = new HashMap<>();
   private Map<String, Integer> jumpDict = new HashMap<>();
-
-  public void ReadFile() {
-
-    Scanner scanner = new Scanner(System.in);
-    System.out.print("Digite o nome do arquivo a ser lido: ");
-    String file = scanner.nextLine();
-    file = "programas_teste/" + file;
-
-    // Guarda as variáveis da área de dados
-    // Verifica tamanho do programa e organiza codigo para facilitar a busca do PC
-    try {
-      FileReader flieReader = new FileReader(file);
-      BufferedReader reader = new BufferedReader(flieReader);
-      String line;
-      boolean dataArea = false;
-      boolean codeArea = false;
-      int cont = 0;
-
-      while ((line = reader.readLine()) != null) {
-        if (line.trim().isEmpty()) {
-          continue;
-        }
-
-        String[] rawWords = line.split("\\s+");
-        String[] words = Arrays.stream(rawWords)
-            .filter(word -> !word.trim().isEmpty())
-            .toArray(String[]::new);
-
-        String instruction = words[0];
-
-        if (instruction.toLowerCase().equals(".data")) {
-          dataArea = true;
-        } else if (instruction.toLowerCase().equals(".enddata")) {
-          dataArea = false;
-        } else if (dataArea) {
-          dataDict.put(instruction, Double.parseDouble(words[1]));
-        } else if (instruction.toLowerCase().equals(".code")) {
-          codeArea = true;
-        } else if (instruction.toLowerCase().equals(".endcode")) {
-          codeArea = false;
-        } else if (codeArea) {
-          if (words.length == 1) {
-            jumpDict.put(words[0].toLowerCase().replace(":", ""), cont);
-          } else {
-            codeDict.put(cont, words);
-            cont += 1;
-          }
-        }
-      }
-      reader.close();
-    } catch (IOException e) {
-      System.err.println("Ocorreu um erro ao ler o arquivo: " + e.getMessage());
-    }
-
-    // // Imprime a área de dados do programa
-    // System.out.println(dataDict.toString() + "\n");
-
-    // // Imprime a área de código do programa
-    // System.out.println(codeDict.toString() + "\n");
-    // for (int i = 0; i < codeDict.size(); i++) {
-    // System.out.println(codeDict.get(i)[0] + " " + codeDict.get(i)[1]);
-    // }
-
-    // // Imprime a área de jumps do programa
-    // System.out.println(jumpDict.toString() + "\n");
-
-    // Executa o programa
-    execute(scanner);
-    scanner.close();
-  }
 
   private void execute(Scanner scanner) {
     boolean endcode = false;
@@ -205,4 +131,25 @@ public class ProgramParser {
   private void updatePc(int newPc) {
     pc = newPc;
   }
+
+  public double getAcc() {
+    return acc;
+  }
+
+  public int getPc() {
+    return pc;
+  }
+
+  public Map<String, Double> getDataDict() {
+    return dataDict;
+  }
+
+  public Map<Integer, String[]> getCodeDict() {
+    return codeDict;
+  }
+
+  public Map<String, Integer> getJumpDict() {
+    return jumpDict;
+  }
+  
 }

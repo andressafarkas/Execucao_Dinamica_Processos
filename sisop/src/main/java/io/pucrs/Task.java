@@ -2,7 +2,6 @@ package io.pucrs;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -17,17 +16,23 @@ public class Task {
   private boolean isFinished;
   private int executedCi;
   private int currentPi;
+  private ProgramParser parser;
   private Map<String, Double> dataDict = new HashMap<>();
   private Map<Integer, String[]> codeDict = new HashMap<>();
   private Map<String, Integer> jumpDict = new HashMap<>();
   private int pc;
   private double acc;
+  private int priority; // Você pode ajustar a inicialização dessa variável conforme sua lógica de prioridade
 
-  public Task(String file, int arrivalTime, int ci, int pi) {
+  public Task(String file, int arrivalTime, int ci, int pi, ProgramParser parser) {
     this.file = file;
     this.arrivalTime = arrivalTime;
     this.ci = ci;
     this.pi = pi;
+    this.parser = parser;
+    this.dataDict = parser.getDataDict(); // Copia os dados do parser para a task
+    this.codeDict = parser.getCodeDict(); // Copia os dados do parser para a task
+    this.jumpDict = parser.getJumpDict(); // Copia os dados do parser para a task
 
     this.isFinished = false;
     this.executedCi = 0;
@@ -46,14 +51,6 @@ public class Task {
       this.executedCi = 0;
       this.isFinished = true;
     }
-  }
-
-  public void updateAcc(double newAcc) {
-    this.acc = newAcc;
-  }
-
-  public void updatePc(int newPc) {
-    this.pc = newPc;
   }
 
   @Override

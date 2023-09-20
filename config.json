@@ -1,5 +1,5 @@
 {
-  "fullPath": "C:\\Users\\frtas\\source\\repos\\Execucao_Dinamica_Processos\\programas_teste",
+  "fullPath": "D:\\Desktop\\PUC\\SISOP\\Execucao_Dinamica_Processos\\programas_teste",
   "files": ["prog1.txt", "prog2.txt"],
   "execTimes": [25, 35],
   "deadlines": [50, 80],

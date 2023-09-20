@@ -1,14 +1,10 @@
 package io.pucrs;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Getter;
@@ -37,6 +33,7 @@ public class Simulation {
   public void Run() {
     // Pega as informações do arquivo de configurações config.json
     ReadConfigFile();
+    Reader reader = new Reader();
 
     // Atualiza os estados iniciais
     this.ready = new ArrayList<>();
@@ -44,12 +41,15 @@ public class Simulation {
     this.running = new ArrayList<>();
 
     for (int i = 0; i < config.getFiles().size(); i++) {
-      this.ready.add(
-          new Task(
-              config.getFiles().get(i),
+        ProgramParser parser = reader.ReadFile(config.getFiles().get(i));
+        this.ready.add(
+          new Task(config.getFiles().get(i), 
               config.getArrivalTimes().get(i),
               config.getExecTimes().get(i),
-              config.getDeadlines().get(i)));
+              config.getDeadlines().get(i),
+              parser
+              )
+          );
     }
 
     // Loop da simulação
