@@ -34,15 +34,32 @@ public class Simulation {
     this.running = new ArrayList<>();
   }
 
+  private void checkForDeadlineBreaches() {
+    for (Task task : this.ready) {
+      if (this.currentTime > task.getPi()) {
+        // A tarefa não cumpriu o deadline
+        task.setPriority(Integer.MAX_VALUE); // torna essa tarefa a mais prioritária
+      }
+    }
+
+    // Ordena a lista de prontos pela prioridade e pelo deadline
+    this.ready.sort((task1, task2) -> {
+      if (task1.getPriority() == task2.getPriority()) {
+        return Integer.compare(task1.getPi(), task2.getPi());
+      }
+      return Integer.compare(task2.getPriority(), task1.getPriority());
+    });
+  }
+
   public void Run() {
     // Pega as informações do arquivo de configurações config.json
     ReadConfigFile();
-
+  
     // Atualiza os estados iniciais
     this.ready = new ArrayList<>();
     this.blocked = new ArrayList<>();
     this.running = new ArrayList<>();
-
+  
     for (int i = 0; i < config.getFiles().size(); i++) {
       this.ready.add(
           new Task(
@@ -51,26 +68,29 @@ public class Simulation {
               config.getExecTimes().get(i),
               config.getDeadlines().get(i)));
     }
-
+  
     // Loop da simulação
     this.currentTime = 0;
     while (this.currentTime <= this.config.getTotalTime()) {
-      // Executa a tarefa com maior prioridade (menor deadline)
+      // Verifica se alguma tarefa não cumpriu o deadline e ajusta a prioridade
+      checkForDeadlineBreaches();
+  
+      // Executa a tarefa com maior prioridade (e menor deadline em caso de empate)
       GetSmallestDeadlineTask();
-
+  
       // TODO : Executar linha código refente ao PC atual
       // TODO : Atualizar o Acc e Pc da atividade que está sendo executada
-
+  
       // Atualiza o tempo atual
       this.currentTime++;
-
+  
       // Atualiza o tempo da atividade que está sendo executada
       if (!this.running.isEmpty())
         this.running.get(0).updateCi();
-
+  
       // Imprime informação da atividade que está sendo executada
       DisplaySimulation(currentTime);
-
+  
       // Atualiza deadlines e verifica se a atividade corrente já finalizou
       // no período atual
       UpdateDeadlines();

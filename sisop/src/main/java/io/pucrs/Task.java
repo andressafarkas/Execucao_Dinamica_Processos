@@ -22,13 +22,14 @@ public class Task {
   private Map<String, Integer> jumpDict = new HashMap<>();
   private int pc;
   private double acc;
+  private int priority;
 
   public Task(String file, int arrivalTime, int ci, int pi) {
     this.file = file;
     this.arrivalTime = arrivalTime;
     this.ci = ci;
     this.pi = pi;
-
+    this.priority = 0;
     this.isFinished = false;
     this.executedCi = 0;
     this.currentPi = pi;
