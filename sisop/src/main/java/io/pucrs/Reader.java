@@ -4,11 +4,15 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class Reader {
 
   public ProgramParser ReadFile(String file) {
     ProgramParser parser = new ProgramParser();
+    Scanner scanner = new Scanner(System.in);
+    System.out.print("Digite o nome do arquivo a ser lido: ");
+    file = scanner.nextLine();
     file = "programas_teste/" + file;
 
     try {

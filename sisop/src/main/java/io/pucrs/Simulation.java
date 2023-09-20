@@ -33,13 +33,13 @@ public class Simulation {
   public void Run() {
     // Pega as informações do arquivo de configurações config.json
     ReadConfigFile();
-    Reader reader = new Reader();
 
     // Atualiza os estados iniciais
     this.ready = new ArrayList<>();
     this.blocked = new ArrayList<>();
     this.running = new ArrayList<>();
 
+    Reader reader = new Reader();
     for (int i = 0; i < config.getFiles().size(); i++) {
         ProgramParser parser = reader.ReadFile(config.getFiles().get(i));
         this.ready.add(
