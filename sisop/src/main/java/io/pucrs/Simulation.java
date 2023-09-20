@@ -13,144 +13,153 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Simulation {
-  private String path;
-  private int currentTime;
-  private Task currentTask;
-  private ConfigParser config;
+    private String path;
+    private int currentTime;
+    //private Task currentTask;
+    private ConfigParser config;
 
-  private List<Task> blocked;
-  private List<Task> ready;
-  private List<Task> running;
+    private List<Task> blocked;
+    private List<Task> ready;
+    private List<Task> running;
 
-  public Simulation(String path) {
-    this.path = path;
+    public Simulation(String path) {
+        this.path = path;
 
-    this.blocked = new ArrayList<>();
-    this.ready = new ArrayList<>();
-    this.running = new ArrayList<>();
-  }
-
-  public void Run() {
-    // Pega as informações do arquivo de configurações config.json
-    ReadConfigFile();
-
-    // Atualiza os estados iniciais
-    this.ready = new ArrayList<>();
-    this.blocked = new ArrayList<>();
-    this.running = new ArrayList<>();
-
-    Reader reader = new Reader();
-    for (int i = 0; i < config.getFiles().size(); i++) {
-        ProgramParser parser = reader.ReadFile(config.getFiles().get(i));
-        this.ready.add(
-          new Task(config.getFiles().get(i), 
-              config.getArrivalTimes().get(i),
-              config.getExecTimes().get(i),
-              config.getDeadlines().get(i),
-              parser
-              )
-          );
+        this.blocked = new ArrayList<>();
+        this.ready = new ArrayList<>();
+        this.running = new ArrayList<>();
     }
 
-    // Loop da simulação
-    this.currentTime = 0;
-    while (this.currentTime <= this.config.getTotalTime()) {
-      // Executa a tarefa com maior prioridade (menor deadline)
-      GetSmallestDeadlineTask();
+    public void Run() {
+        // Pega as informações do arquivo de configurações config.json
+        ReadConfigFile();
 
-      // TODO : Executar linha código refente ao PC atual
-      // TODO : Atualizar o Acc e Pc da atividade que está sendo executada
+        // Atualiza os estados iniciais
+        this.ready = new ArrayList<>();
+        this.blocked = new ArrayList<>();
+        this.running = new ArrayList<>();
 
-      // Atualiza o tempo atual
-      this.currentTime++;
+        Reader reader = new Reader();
+        for (int i = 0; i < config.getFiles().size(); i++) {
+            ProgramParser parser = reader.ReadFile(config.getFiles().get(i));
+            this.ready.add(
+                    new Task(config.getFiles().get(i),
+                            config.getArrivalTimes().get(i),
+                            config.getExecTimes().get(i),
+                            config.getDeadlines().get(i),
+                            parser));
+        }
 
-      // Atualiza o tempo da atividade que está sendo executada
-      if (!this.running.isEmpty())
-        this.running.get(0).updateCi();
+        // Loop da simulação
+        this.currentTime = 0;
+        GetSmallestDeadlineTask();
 
-      // Imprime informação da atividade que está sendo executada
-      DisplaySimulation(currentTime);
+        while (this.currentTime <= this.config.getTotalTime()) {
+            // Executa a tarefa com maior prioridade (menor deadline)
 
-      // Atualiza deadlines e verifica se a atividade corrente já finalizou
-      // no período atual
-      UpdateDeadlines();
-    }
-  }
+            if (!this.running.isEmpty())
+                if (this.running.get(0).getParser().execute()) {
+                    this.running.get(0).setFinished(true);
+                    this.running.remove(0);
+                }
+            
+            GetSmallestDeadlineTask();
 
-  private void UpdateDeadlines() {
-    /*
-     * Se o tempo atual alcançar o deadline das atividades na fila de prontas
-     * então atualiza o novo deadline dessas atividades e marca a flag isFinished
-     * como falsa para que elas possam ser executadas no novo deadline delas
-     */
-    for (int i = 0; i < this.ready.size(); i++) {
-      if (this.ready.get(i).getPi() == this.currentTime) {
-        this.ready.get(i).setFinished(false);
-        int newPi = this.ready.get(i).getCurrentPi() + this.ready.get(i).getPi();
-        this.ready.get(i).setPi(newPi);
-      }
-    }
+            // Atualiza o tempo atual
+            this.currentTime++;
 
-    /*
-     * Se a atividade que estava sendo executada chegar ao fim dentro do seu
-     * deadline atual, então ela é removida da fila de executando e passa para a
-     * fila de prontos
-     */
-    if (!this.running.isEmpty() && this.running.get(0).isFinished()) {
-      this.ready.add(this.running.remove(0));
-    }
-  }
+            // Atualiza o tempo da atividade que está sendo executada
+            if (!this.running.isEmpty())
+                this.running.get(0).updateCi();
 
-  private void GetSmallestDeadlineTask() {
-    /*
-     * Busca a tarefa, que esteja disponível para ser executada, que tenha o menor
-     * deadline entre as tarefas que estão sendo executadas e as que estão prontas
-     */
-    int smallestDealine = this.running.size() > 0 ? this.running.get(0).getPi() : Integer.MAX_VALUE;
-    int taskIndex = 0;
-    for (int i = 0; i < this.ready.size(); i++) {
-      if (this.ready.get(i).isFinished() == false && this.ready.get(i).getPi() < smallestDealine) {
-        smallestDealine = this.ready.get(i).getPi();
-        taskIndex = i;
-      }
+            // Imprime informação da atividade que está sendo executada
+            DisplaySimulation(currentTime);
+
+            // Atualiza deadlines e verifica se a atividade corrente já finalizou
+            // no período atual
+            UpdateDeadlines();
+        }
     }
 
-    /*
-     * Preempta a atividade com menor deadline para a lista de tarefas em execução
-     * e atualiza a lista de tarefas prontas
-     */
-    if (this.running.size() > 0 && this.running.get(0).getPi() > smallestDealine) {
-      this.ready.add(this.running.remove(0));
-      this.running.add(this.ready.remove(taskIndex));
-    } else if (this.running.isEmpty() && smallestDealine < Integer.MAX_VALUE) {
-      this.running.add(this.ready.remove(taskIndex));
-    }
-  }
+    private void UpdateDeadlines() {
+        /*
+         * Se o tempo atual alcançar o deadline das atividades na fila de prontas
+         * então atualiza o novo deadline dessas atividades e marca a flag isFinished
+         * como falsa para que elas possam ser executadas no novo deadline delas
+         */
+        for (int i = 0; i < this.ready.size(); i++) {
+            if (this.ready.get(i).getPi() == this.currentTime) {
+                this.ready.get(i).setFinished(false);
+                int newPi = this.ready.get(i).getCurrentPi() + this.ready.get(i).getPi();
+                this.ready.get(i).setPi(newPi);
+            }
+        }
 
-  private void DisplaySimulation(int currentTime) {
-    String displayTasks = Integer.toString(currentTime);
-
-    if (this.running.isEmpty()) {
-      displayTasks += "\t-";
-    } else {
-      displayTasks += "\t" + this.running.get(0).getFile();
+        /*
+         * Se a atividade que estava sendo executada chegar ao fim dentro do seu
+         * deadline atual, então ela é removida da fila de executando e passa para a
+         * fila de prontos
+         */
+        if (!this.running.isEmpty() && this.running.get(0).isFinished()) {
+            this.ready.add(this.running.remove(0));
+        }
     }
-    System.out.println(displayTasks);
-  }
 
-  private void ReadConfigFile() {
-    /*
-     * Realiza a leitura do arquivo de configuração e faz o parser das informações
-     * para a classe ConfigParser
-     */
-    try {
-      ObjectMapper objectMapper = new ObjectMapper();
-      File configFile = new File(this.path);
-      this.config = objectMapper.readValue(configFile, ConfigParser.class);
-    } catch (IOException e) {
-      e.printStackTrace();
-      System.out
-          .println("\nSomething happened while trying to read information from the config file! Please try again.\n");
+    private void GetSmallestDeadlineTask() {
+        /*
+         * Busca a tarefa, que esteja disponível para ser executada, que tenha o menor
+         * deadline entre as tarefas que estão sendo executadas e as que estão prontas
+         */
+        int smallestDealine = this.running.size() > 0 ? this.running.get(0).getPi() : Integer.MAX_VALUE;
+        int taskIndex = 0;
+        for (int i = 0; i < this.ready.size(); i++) {
+            if (this.ready.get(i).isFinished() == false && this.ready.get(i).getPi() < smallestDealine) {
+                smallestDealine = this.ready.get(i).getPi();
+                taskIndex = i;
+            }
+        }
+
+       // currentTask = this.ready.get(taskIndex);
+
+        /*
+         * Preempta a atividade com menor deadline para a lista de tarefas em execução
+         * e atualiza a lista de tarefas prontas
+         */
+        if (this.running.size() > 0 && this.running.get(0).getPi() > smallestDealine) {
+            this.ready.add(this.running.remove(0));
+            this.running.add(this.ready.remove(taskIndex));
+        } else if (this.running.isEmpty() && smallestDealine < Integer.MAX_VALUE) {
+            this.running.add(this.ready.remove(taskIndex));
+        }
+
     }
-  }
+
+    private void DisplaySimulation(int currentTime) {
+        String displayTasks = Integer.toString(currentTime);
+
+        if (this.running.isEmpty()) {
+            displayTasks += "\t-";
+        } else {
+            displayTasks += "\t" + this.running.get(0).getFile();
+        }
+        System.out.println(displayTasks);
+    }
+
+    private void ReadConfigFile() {
+        /*
+         * Realiza a leitura do arquivo de configuração e faz o parser das informações
+         * para a classe ConfigParser
+         */
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            File configFile = new File(this.path);
+            this.config = objectMapper.readValue(configFile, ConfigParser.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out
+                    .println(
+                            "\nSomething happened while trying to read information from the config file! Please try again.\n");
+        }
+    }
 }

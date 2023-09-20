@@ -1,8 +1,8 @@
 {
-  "fullPath": "D:\\Desktop\\PUC\\SISOP\\Execucao_Dinamica_Processos\\programas_teste",
+  "fullPath": "\\Users\\luanathomas\\Library\\CloudStorage\\OneDrive-PUCRS-BR\\PUCRS\\5 - Quinto Semestre\\6 - Sistemas Operacionais\\T1_SISOP\\programas_teste",
   "files": ["prog1.txt", "prog2.txt"],
   "execTimes": [25, 35],
-  "deadlines": [50, 80],
+  "deadlines": [80, 50],
   "arrivalTimes": [0, 0],
-  "totalTime": 200
+  "totalTime": 100
 }
