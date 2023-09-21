@@ -1,6 +1,8 @@
 package io.pucrs;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -10,55 +12,58 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Task {
-  private String file;
+  private int id;
+  private String programFile;
+
   private int arrivalTime;
-  private int ci;
-  private int pi;
+  private int executionTime;
+  private int currentExecutionTime;
+  private int deadline;
+  private int currentDeadline;
   private boolean isFinished;
-  private int executedCi;
-  private int currentPi;
-  private Map<String, Double> dataDict = new HashMap<>();
-  private Map<Integer, String[]> codeDict = new HashMap<>();
-  private Map<String, Integer> jumpDict = new HashMap<>();
+
   private int pc;
   private double acc;
+  private List<Integer> lostDeadlines;
 
-  public Task(String file, int arrivalTime, int ci, int pi) {
-    this.file = file;
+  public Task(int id, String programFile, int arrivalTime, int executionTime, int deadline) {
+    this.id = id;
+    this.programFile = programFile;
+
     this.arrivalTime = arrivalTime;
-    this.ci = ci;
-    this.pi = pi;
-
+    this.executionTime = executionTime;
+    this.currentExecutionTime = 0;
+    this.deadline = deadline;
+    this.currentDeadline = deadline;
     this.isFinished = false;
-    this.executedCi = 0;
-    this.currentPi = pi;
+
+    this.pc = 0;
+    this.acc = 0;
+    this.lostDeadlines = new ArrayList<>();
   }
 
-  public void updateCi() {
+  public void updateExecutionTime() {
     /*
      * Verifica se o tempo de execução da tarefa foi concluído;
      * Se sim, zera o tempo e marca a flag isFinish como true para indicar que
      * essa tarefa não pode mais ocorrer dentro do deadline atual;
      */
 
-    this.executedCi++;
-    if (this.executedCi == this.ci) {
-      this.executedCi = 0;
+    this.currentExecutionTime++;
+    if (this.currentExecutionTime == this.executionTime) {
+      this.currentExecutionTime = 0;
       this.isFinished = true;
     }
   }
 
-  public void updateAcc(double newAcc) {
-    this.acc = newAcc;
-  }
-
-  public void updatePc(int newPc) {
-    this.pc = newPc;
+  public void addLostDeadline(int currentGlobalTime) {
+    lostDeadlines.add(currentGlobalTime);
   }
 
   @Override
   public String toString() {
-    return "Task [file=" + file + ", arrivalTime=" + arrivalTime + ", ci=" + ci + ", pi=" + pi + "]";
+    return "Task [file=" + this.programFile + ", arrivalTime=" + arrivalTime + ", ci=" + this.executionTime + ", pi="
+        + this.deadline + "]";
   }
 
 }
