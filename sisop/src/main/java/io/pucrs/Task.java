@@ -21,12 +21,14 @@ public class Task {
   private int deadline;
   private int currentDeadline;
   private boolean isFinished;
+  private boolean isBlocked;
 
-  private int pc;
-  private double acc;
+  private double taskAcc;
+  private Map<String, Double> taskDataDict;
+  private ProgramParser parser;
   private List<Integer> lostDeadlines;
 
-  public Task(int id, String programFile, int arrivalTime, int executionTime, int deadline) {
+  public Task(int id, String programFile, int arrivalTime, int executionTime, int deadline, ProgramParser parser) {
     this.id = id;
     this.programFile = programFile;
 
@@ -36,24 +38,31 @@ public class Task {
     this.deadline = deadline;
     this.currentDeadline = deadline;
     this.isFinished = false;
+    this.isBlocked = false;
 
-    this.pc = 0;
-    this.acc = 0;
+    this.taskAcc = 0;
+    this.taskDataDict = new HashMap<>();
+    this.parser = parser;
     this.lostDeadlines = new ArrayList<>();
   }
 
-  public void updateExecutionTime() {
+  public void updateTask() {
     /*
      * Verifica se o tempo de execução da tarefa foi concluído;
      * Se sim, zera o tempo e marca a flag isFinish como true para indicar que
      * essa tarefa não pode mais ocorrer dentro do deadline atual;
      */
-
     this.currentExecutionTime++;
-    if (this.currentExecutionTime == this.executionTime) {
+
+    if (this.getParser().execute()) {
       this.currentExecutionTime = 0;
       this.isFinished = true;
+
+      this.getParser().restoreValues();
     }
+
+    if (this.getParser().getAditionalTime() != 0)
+      this.isBlocked = true;
   }
 
   public void addLostDeadline(int currentGlobalTime) {
