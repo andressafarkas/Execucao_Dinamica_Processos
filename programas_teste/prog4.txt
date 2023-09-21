@@ -3,7 +3,7 @@
   sub #5
   store a
   add #3
-  store a
+  syscall 1
   syscall 0
 .endcode
 
