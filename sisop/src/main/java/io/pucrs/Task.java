@@ -43,6 +43,7 @@ public class Task {
     this.taskAcc = 0;
     this.taskDataDict = new HashMap<>();
     this.parser = parser;
+    this.parser.setTaskId(id);
     this.lostDeadlines = new ArrayList<>();
   }
 

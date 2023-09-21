@@ -14,6 +14,8 @@ public class ProgramParser {
   private Map<Integer, String[]> codeDict = new HashMap<>();
   private Map<String, Integer> jumpDict = new HashMap<>();
 
+  private int taskId;
+
   // public void execute(Scanner scanner) {
   public boolean execute() {
 
@@ -120,7 +122,7 @@ public class ProgramParser {
         } else if (op.equals("2")) {
           updateAditionalTime(new Random().nextInt(3 - 1) + 1);
           System.out.println("Blocked by " + this.aditionalTime + " time units!");
-          System.out.print("Enter a value: ");
+          System.out.print("Enter a value for task P" + this.taskId + ": ");
           Scanner scanner = new Scanner(System.in);
           acc = scanner.nextDouble();
         }
@@ -150,6 +152,10 @@ public class ProgramParser {
 
   public int getPc() {
     return pc;
+  }
+
+  public void setTaskId(int id) {
+    this.taskId = id;
   }
 
   public int getAditionalTime() {
