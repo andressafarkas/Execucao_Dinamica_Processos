@@ -120,7 +120,7 @@ public class ProgramParser {
         } else if (op.equals("2")) {
           updateAditionalTime(new Random().nextInt(3 - 1) + 1);
           System.out.println("Blocked by " + this.aditionalTime + " time units!");
-          System.out.println("Enter a value: ");
+          System.out.print("Enter a value: ");
           Scanner scanner = new Scanner(System.in);
           acc = scanner.nextDouble();
         }

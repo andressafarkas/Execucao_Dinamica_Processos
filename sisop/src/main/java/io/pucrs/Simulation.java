@@ -245,17 +245,19 @@ public class Simulation {
     String displayTasks = Integer.toString(this.currentTime);
     String deadlines = "\t";
 
-    if (!this.running.isEmpty()) {
-      int runningTaskId = this.running.get(0).getId();
-      for (int i = 0; i < this.config.getFiles().size(); i++) {
-        if (runningTaskId == i)
-          displayTasks += "\tX";
-        else
-          displayTasks += "\t-";
+    for (int i = 0; i < this.config.getFiles().size(); i++) {
+      for (Task runningTask : this.running) {
+        if (runningTask.getId() == i && runningTask.isBlocked()) displayTasks += "\tB";
+        else if (runningTask.getId() == i) displayTasks += "\tX";
       }
-    } else {
-      for (int i = 0; i < this.config.getFiles().size(); i++) {
-        displayTasks += "\t-";
+      for (Task readyTask : this.ready) {
+        if (readyTask.getId() == i) displayTasks += "\t-";
+      }
+      for (Task blockedTask : this.blocked) {
+        if (blockedTask.getId() == i) displayTasks += "\tB";
+      }
+      for (Task waitingTask : this.waiting) {
+        if (waitingTask.getId() == i) displayTasks += "\tW";
       }
     }
 
