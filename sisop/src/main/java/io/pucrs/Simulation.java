@@ -221,8 +221,7 @@ public class Simulation {
      * Preempta a atividade com menor deadline para a lista de tarefas em execução
      * e atualiza a lista de tarefas prontas
      */
-    if (this.running.size() > 0 && this.running.get(0).isFinished()
-        && this.running.get(0).getCurrentDeadline() > smallestDealine) {
+    if (!this.running.isEmpty() && this.running.get(0).getCurrentDeadline() > smallestDealine) {
       this.ready.add(this.running.remove(0));
       this.running.add(this.ready.remove(taskIndex));
     } else if (this.running.isEmpty() && smallestDealine < Integer.MAX_VALUE) {
