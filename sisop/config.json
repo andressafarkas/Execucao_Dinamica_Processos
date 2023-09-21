@@ -1,8 +1,8 @@
 {
   "fullPath": "C:\\Users\\felip\\source\\repos\\Execucao_Dinamica_Processos\\programas_teste\\",
-  "files": ["prog1.txt", "prog4.txt", "prog5.txt"],
-  "execTimes": [1, 6, 6],
-  "deadlines": [7, 15, 10],
-  "arrivalTimes": [1, 3, 0],
-  "totalTime": 35
+  "files": ["prog1.txt", "prog2.txt"],
+  "execTimes": [4, 19],
+  "deadlines": [6, 30],
+  "arrivalTimes": [0, 0],
+  "totalTime": 90
 }
